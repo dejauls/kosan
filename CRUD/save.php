@@ -14,14 +14,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $kecamatan = $_POST['kecamatan'];
     $latitude = $_POST['latitude'];
     $longitude = $_POST['longitude'];
-    
-    // Upload foto
-    $foto = $_FILES['foto']['file'];
-    $target_dir = "uploads/file";
-    $target_file = $target_dir . basename($foto);
-    move_uploaded_file($_FILES['foto']['tmp_name'], $target_file);
 
-    $sql = "INSERT INTO unimal (universitas, nama_kos, jenis_kos, tipe_kos, deskripsi, nomor_whatsapp, alamat, provinsi, kota, kecamatan, latitude, longitude, foto) VALUES ('$universitas', '$nama_kos', '$jenis_kos', '$tipe_kos', '$deskripsi', '$nomor_whatsapp', '$alamat', '$provinsi', '$kota', '$kecamatan', '$latitude', '$longitude', '$target_file')";
+    // Upload foto
+    if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+        $foto = $_FILES['foto']['name']; // Nama file asli
+        $foto_path = "../uploads/" . $foto; // Gabungkan dengan prefix ../uploads/
+    } else {
+        echo "Tidak ada file yang diunggah atau terjadi kesalahan.";
+        exit;
+    }
+
+    // Debugging: Pastikan $foto_path sudah benar
+    echo "Nama file yang akan disimpan: $foto_path"; // Hapus echo ini setelah debugging
+
+
+    $sql = "INSERT INTO unimal (universitas, nama_kos, jenis_kos, tipe_kos, deskripsi, nomor_whatsapp, alamat, provinsi, kota, kecamatan, latitude, longitude, foto) VALUES ('$universitas', '$nama_kos', '$jenis_kos', '$tipe_kos', '$deskripsi', '$nomor_whatsapp', '$alamat', '$provinsi', '$kota', '$kecamatan', '$latitude', '$longitude', '$foto_path')";
 
     if ($conn->query($sql) === TRUE) {
         header("Location: index.php");
@@ -31,4 +38,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 } else {
     header("Location: create.php");
 }
-?>
